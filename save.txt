@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+</head>
+<body>
+<center>
+<?php
+if(isset($_POST["login"])){
+
+    $host="localhost";
+    $username="root";
+    $pass="";
+    $dbname="project_db";
+
+    $conn = mysqli_connect($host, $username, $pass) or die("فشل الاتصال: " . mysqli_connect_error());
+    $conn->select_db($dbname);
+
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+
+    // التحقق من المستخدم
+    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+    $result = mysqli_query($conn, $sql);
+
+    if(mysqli_num_rows($result) > 0){
+        echo "<p>تم تسجيل الدخول بنجاح! 🎉</p>";
+        // هنا يمكنك إعادة التوجيه لصفحة المستخدم الرئيسية
+        // header("location: dashboard.php");
+    } else {
+        echo "<p>البريد أو كلمة المرور غير صحيحة!</p>";
+    }
+
+    mysqli_close($conn);
+
+} else { 
+?>
+
+<h2>تسجيل الدخول</h2>
+<form action="<?php echo $_SERVER["PHP_SELF"];?>" method="POST">
+    <label for="email">البريد الإلكتروني:</label>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="password">كلمة المرور:</label>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <button type="submit" name="login">تسجيل الدخول</button>
+</form>
+
+<p>إذا لم يكن لديك حساب، <a href="register.php">سجل الآن</a></p>
+<p><a href="forgot_password.php">نسيت كلمة المرور؟</a></p>
+
+<?php
+}
+?>
+
+</body>
+</html>
+
+
+
+
+
+
+================================
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>register</title>
+</head>
+<body>
+    <center>
+    <?php
+
+if(isset($_POST["register"])){
+
+$host="localhost";
+$username="root";
+$pass="";
+$dbname="project_db";
+
+
+$conn=mysqli_connect($host,$username,$pass)or die("fail conn!" . mysqli_connect_error());
+
+$conn->query("CREATE DATABASE IF NOT EXISTS $dbname");
+
+$conn->select_db($dbname);
+
+$conn->query("CREATE TABLE IF NOT EXISTS users(
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL
+    )");
+   
+    $name=$_POST["name"];
+    $email=$_POST["email"];
+    $password=$_POST["password"];
+
+     $sql= "INSERT INTO users(email, password,name) values('$email', '$password','$name')";
+
+    $query = mysqli_query($conn , $sql) or die("فشل الاتصال " . mysqli_error($conn));
+
+echo "عدد الحقول المتاثره : " . mysqli_affected_rows($conn);
+?>
+
+<p>تم ادراج البيانات لقاعدة البيانات وستعود لصفحة التسجيل خلال خمسة ثواني</p>
+
+<p> اذا كنت لا تريد الانتظار <a href="login.php">اضغط هنا</a></p>
+
+<?php
+header("refresh:5; url=dp.php");
+mysqli_close($conn);
+
+}else{
+
+?>
+<form action="<?php echo $_SERVER["PHP_SELF"];?>" method="POST">
+
+
+<label for="name">Name: </label>
+<input type="text" id="name" name="name" required><br><br>
+
+
+<label for="email">email:</label>
+<input type="email" id="email" name="email" required> <br><br>
+
+<label for="password">password:</label>
+<input type="password" id="password" name="password" required><br><br>
+
+<button type="submit" name="register" >register</button>
+</form>
+
+<?php
+
+}
+?>
+</body>
+</html>
